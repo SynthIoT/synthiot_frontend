@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/AuthService";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Leaf } from "lucide-react";
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -28,13 +28,20 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    // Add padding-top to push below navbar
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 px-6 pt-28 md:pt-32 flex items-start md:items-center justify-center">
       <div className="bg-white/95 backdrop-blur-xl border-2 border-green-200 rounded-3xl p-10 w-full max-w-lg shadow-2xl">
         <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Leaf className="w-8 h-8 text-green-600" />
+            <span className="text-2xl font-extrabold text-green-700">SYNTHIOT</span>
+          </div>
           <h2 className="text-4xl font-bold text-green-700">
             {step === 1 ? "Create Free Account" : "Almost There!"}
           </h2>
-          <p className="text-green-600 mt-2">Join 10,000+ developers generating synthetic data</p>
+          <p className="text-green-600 mt-2">
+            Join 10,000+ developers generating synthetic data
+          </p>
         </div>
 
         {error && (

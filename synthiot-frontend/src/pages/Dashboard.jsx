@@ -18,14 +18,17 @@ export default function Dashboard() {
       return;
     }
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user_id]);
 
   const fetchProjects = async () => {
     try {
       const res = await API.get(`/project/get-project/${user_id}`);
-      setProjects(res.data);
+      const payload = res?.data?.data ?? res?.data ?? [];
+      setProjects(Array.isArray(payload) ? payload : []);
     } catch (err) {
       console.error(err);
+      setProjects([]);
     }
   };
 
@@ -33,7 +36,8 @@ export default function Dashboard() {
     e.preventDefault();
     try {
       if (editing) {
-        await API.put(`/project/update-project/${editing.id}/${user_id}`, form);
+        const pid = editing.id ?? editing.project_id;
+        await API.put(`/project/update-project/${pid}/${user_id}`, form);
       } else {
         await API.post(`/project/create-project/${user_id}`, form);
       }
@@ -59,9 +63,9 @@ export default function Dashboard() {
   const openEdit = (proj) => {
     setEditing(proj);
     setForm({
-      name: proj.name,
-      description: proj.description,
-      sensor_type: proj.sensor_type,
+      name: proj.name ?? "",
+      description: proj.description ?? "",
+      sensor_type: proj.sensor_type ?? "AM2320",
     });
     setShowModal(true);
   };
@@ -99,45 +103,50 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((proj) => (
-              <div
-                key={proj.id}
-                className="bg-white/90 backdrop-blur border-2 border-green-200 rounded-3xl p-8 hover:border-green-400 hover:shadow-2xl transition-all"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-bold text-green-800">{proj.name}</h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openEdit(proj)}
-                      className="p-2 bg-green-100 hover:bg-green-200 rounded-lg transition"
-                    >
-                      <Edit2 size={18} className="text-green-700" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(proj.id)}
-                      className="p-2 bg-red-100 hover:bg-red-200 rounded-lg transition"
-                    >
-                      <Trash2 size={18} className="text-red-600" />
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-green-600 mb-6 leading-relaxed">{proj.description}</p>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <Droplets className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-green-700">{proj.sensor_type}</span>
-                </div>
-
-                <Link
-                    to={`/chat/${proj.id}`}
-                    className="mt-6 w-full py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold transition block text-center"
+            {projects.map((proj) => {
+              const pid = proj.id ?? proj.project_id; // ensure we send the right id
+              return (
+                <div
+                  key={pid}
+                  className="bg-white/90 backdrop-blur border-2 border-green-200 rounded-3xl p-8 hover:border-green-400 hover:shadow-2xl transition-all"
                 >
-                Open Chat
-                </Link>
-                
-              </div>
-            ))}
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-2xl font-bold text-green-800">
+                      {proj.name ?? `Project ${String(pid).slice(0, 6)}`}
+                    </h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openEdit(proj)}
+                        className="p-2 bg-green-100 hover:bg-green-200 rounded-lg transition"
+                      >
+                        <Edit2 size={18} className="text-green-700" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(pid)}
+                        className="p-2 bg-red-100 hover:bg-red-200 rounded-lg transition"
+                      >
+                        <Trash2 size={18} className="text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-green-600 mb-6 leading-relaxed">{proj.description}</p>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <Droplets className="w-5 h-5 text-green-500" />
+                    <span className="font-medium text-green-700">{proj.sensor_type}</span>
+                  </div>
+
+                  <Link
+                    to={`/chat/${pid}`}
+                    state={{ projectId: pid }} // optional backup route data
+                    className="mt-6 w-full py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold transition block text-center"
+                  >
+                    Open Chat
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

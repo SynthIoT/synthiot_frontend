@@ -15,16 +15,20 @@ export default function Login() {
       localStorage.setItem("user_id", user.uid);
       localStorage.setItem("token", "synthiot-jwt");
       navigate("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    // Add top padding so the fixed navbar never covers the card
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 px-6 pt-28 md:pt-32 flex items-start md:items-center justify-center">
       <div className="bg-white/95 backdrop-blur-xl border-2 border-green-200 rounded-3xl p-10 w-full max-w-lg shadow-2xl">
         <div className="text-center mb-8">
-          <Leaf className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Leaf className="w-8 h-8 text-green-600" />
+            <span className="text-2xl font-extrabold text-green-700">SYNTHIOT</span>
+          </div>
           <h2 className="text-4xl font-bold text-green-700">Welcome Back!</h2>
           <p className="text-green-600 mt-2">Log in to generate synthetic data</p>
         </div>
